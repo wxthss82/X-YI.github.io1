@@ -1,21 +1,74 @@
 <html>
+<HEAD>
+    <META http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <TITLE>ServerDate Example</TITLE>
+</HEAD>
+
+<BODY>
+<H1>ServerDate Example</H1>
+
+<P>The precision may improve after a few seconds as a result of clock
+    synchronization and amortization.</P>
+
+<TABLE border="1">
+    <TR><TD>server</TD><TD id="server"></TD></TR>
+    <TR><TD>client</TD><TD id="client"></TD></TR>
+    <TR><TD>difference</TD>
+        <TD id="difference" style="text-align: right"></TD></TR>
+</TABLE>
+
 <script type="text/javascript" src="./preloadjs-NEXT.min.js"></script>
 <script type="text/javascript" src="./soundjs-NEXT.js"></script>
-    <script>
-        createjs.Sound.on("fileload", handleLoadComplete);
-        createjs.Sound.alternateExtensions = ["mp3"];
-        createjs.Sound.registerSound({src:"./djjy.mp3", id:"sound"});
-        function handleLoadComplete(event) {
-            var now = new Date();
-            // var millisTill10 = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds(), 0) - now;
-            // if (millisTill10 < 0) {
-            //     millisTill10 += 86400000; // it's after 10am, try 10am tomorrow.
-            // }
-            setTimeout(function(){
-                //  var audio = new Audio('http://yitunnel.oss-cn-beijing.aliyuncs.com/djjy.mp3');
-                //  audio.play();
-                createjs.Sound.play("sound");
-            }, 3000);
+<script src="../lib/ServerDate.js"></script>
+<script>
+    var timediff = [];
+    var COUNT = 40;
+
+    createjs.Sound.on("fileload", handleLoadComplete);
+    createjs.Sound.alternateExtensions = ["mp3"];
+    createjs.Sound.registerSound({src:"./djjy.mp3", id:"sound"});
+    function handleLoadComplete(event) {
+
+        function waitForElement(){
+            if(typeof timediff[COUNT - 1] !== "undefined"){
+                var now = new Date();
+                var millis = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 9, 42, 0, 0) - now;
+
+                setTimeout(function(){
+                    //  var audio = new Audio('http://yitunnel.oss-cn-beijing.aliyuncs.com/djjy.mp3');
+                    //  audio.play();
+                    createjs.Sound.play("sound");
+                }, -timediff[COUNT - 1] + millis );
+            }
+            else{
+                setTimeout(waitForElement, 250);
+                if (timediff.length > COUNT + 2)
+                {
+                    timediff.pop();
+                }
+            }
         }
-    </script>
-<body><h1>It works!</h1></body></html>
+
+        function updateClocks()
+        {
+            var client = new Date();
+
+            document.getElementById("server").innerHTML = String(ServerDate);
+            document.getElementById("client").innerHTML = String(client);
+
+            timediff.push(ServerDate - client);
+
+            document.getElementById("difference").innerHTML = (timediff)
+                + " &plusmn; " + ServerDate.getPrecision() + " ms";
+        }
+
+        // Display the clocks and update them every second.
+        updateClocks();
+        setInterval(updateClocks, 1000);
+        waitForElement()
+    }
+    // Display two real time clocks, the server's and the client's, and show the
+    // difference between them in milliseconds.
+</SCRIPT>
+</BODY>
+</HTML>
