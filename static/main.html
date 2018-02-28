@@ -32,13 +32,13 @@
         function waitForElement(){
             if(typeof timediff[COUNT - 1] !== "undefined"){
                 var now = new Date();
-                var millis = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 10, 42, 0, 0) - now;
+                var millis = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 10, 46, 0, 0) - now;
 
                 setTimeout(function(){
                     //  var audio = new Audio('http://yitunnel.oss-cn-beijing.aliyuncs.com/djjy.mp3');
                     //  audio.play();
                     createjs.Sound.play("sound");
-                }, timediff[COUNT - 1] + millis );
+                }, -timediff[COUNT - 1] + millis );
             }
             else{
                 setTimeout(waitForElement, 250);
